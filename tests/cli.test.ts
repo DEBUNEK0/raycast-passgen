@@ -1,6 +1,8 @@
+import { homedir } from "node:os";
+
 import { describe, expect, it, vi } from "vitest";
 
-import { buildPwgenArgs, generatePasswords, type PwgenExecutor } from "../src/lib/cli";
+import { buildPwgenArgs, generatePasswords, listPwgenCandidates, type PwgenExecutor } from "../src/lib/cli";
 import { DEFAULT_OPTIONS } from "../src/lib/presets";
 import { PwgenCliError } from "../src/lib/types";
 
@@ -46,22 +48,33 @@ describe("generatePasswords", () => {
         stderr: "",
       });
 
-    const result = await generatePasswords({ ...DEFAULT_OPTIONS, length: 3 }, executor);
+    const result = await generatePasswords({ ...DEFAULT_OPTIONS, length: 3 }, { executor });
+
 
     expect(result.source).toBe("text");
     expect(result.passwords).toEqual(["AAA"]);
     expect(executor).toHaveBeenCalledTimes(2);
-    expect(executor).toHaveBeenNthCalledWith(1, expect.arrayContaining(["--json"]));
-    expect(executor).toHaveBeenNthCalledWith(2, expect.not.arrayContaining(["--json"]));
+    expect(executor).toHaveBeenNthCalledWith(1, expect.arrayContaining(["--json"]), { preferredExecutablePath: undefined });
+    expect(executor).toHaveBeenNthCalledWith(2, expect.not.arrayContaining(["--json"]), { preferredExecutablePath: undefined });
   });
 
   it("does not fall back when pwgen returns empty output", async () => {
     const executor = vi.fn<PwgenExecutor>().mockResolvedValueOnce({ stdout: "   ", stderr: "" });
 
-    await expect(generatePasswords({ ...DEFAULT_OPTIONS }, executor)).rejects.toMatchObject({
+    await expect(generatePasswords({ ...DEFAULT_OPTIONS }, { executor })).rejects.toMatchObject({
       code: "empty_output",
     } satisfies Partial<PwgenCliError>);
 
     expect(executor).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("listPwgenCandidates", () => {
+  it("prioritizes the configured executable path and common install locations", () => {
+    const candidates = listPwgenCandidates("/custom/pwgen", "/usr/bin:/bin");
+
+    expect(candidates[0]).toBe("/custom/pwgen");
+    expect(candidates).toContain("/usr/bin/pwgen");
+    expect(candidates).toContain(`${homedir()}/.cargo/bin/pwgen`);
   });
 });

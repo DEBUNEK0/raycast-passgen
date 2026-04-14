@@ -1,17 +1,26 @@
 import { execFile } from "node:child_process";
+import { constants } from "node:fs";
+import { access } from "node:fs/promises";
+import { homedir } from "node:os";
+import { delimiter, join } from "node:path";
 import { promisify } from "node:util";
 
 import { parsePwgenJson, parsePwgenText } from "./parser";
 import { GeneratePasswordOptions, ParsedPwgenOutput, PwgenCliError } from "./types";
 
 const execFileAsync = promisify(execFile);
+const COMMON_PWGEN_PATHS = [join(homedir(), ".cargo", "bin", "pwgen"), "/opt/homebrew/bin/pwgen", "/usr/local/bin/pwgen", "/usr/bin/pwgen"];
 
 export interface PwgenProcessResult {
   stdout: string;
   stderr: string;
 }
 
-export type PwgenExecutor = (args: string[]) => Promise<PwgenProcessResult>;
+export interface PwgenExecutionConfig {
+  preferredExecutablePath?: string;
+}
+
+export type PwgenExecutor = (args: string[], config?: PwgenExecutionConfig) => Promise<PwgenProcessResult>;
 
 interface BuildArgsOptions {
   json: boolean;
@@ -55,9 +64,11 @@ export function buildPwgenArgs(options: GeneratePasswordOptions, buildOptions: B
   return args;
 }
 
-export async function execPwgen(args: string[]): Promise<PwgenProcessResult> {
+export async function execPwgen(args: string[], config?: PwgenExecutionConfig): Promise<PwgenProcessResult> {
+  const executablePath = await resolvePwgenExecutable(config?.preferredExecutablePath);
+
   try {
-    const result = await execFileAsync("pwgen", args, {
+    const result = await execFileAsync(executablePath, args, {
       encoding: "utf8",
       maxBuffer: 1024 * 1024,
     });
@@ -73,9 +84,14 @@ export async function execPwgen(args: string[]): Promise<PwgenProcessResult> {
 
 export async function generatePasswords(
   options: GeneratePasswordOptions,
-  executor: PwgenExecutor = execPwgen,
+  config: PwgenExecutionConfig & { executor?: PwgenExecutor } = {},
 ): Promise<ParsedPwgenOutput> {
-  const jsonResult = await executor(buildPwgenArgs(options, { json: true }));
+  const executor = config.executor ?? execPwgen;
+  const executionConfig: PwgenExecutionConfig = {
+    preferredExecutablePath: config.preferredExecutablePath,
+  };
+
+  const jsonResult = await executor(buildPwgenArgs(options, { json: true }), executionConfig);
 
   try {
     return parsePwgenJson(jsonResult.stdout);
@@ -85,8 +101,47 @@ export async function generatePasswords(
     }
   }
 
-  const textResult = await executor(buildPwgenArgs(options, { json: false }));
+  const textResult = await executor(buildPwgenArgs(options, { json: false }), executionConfig);
   return parsePwgenText(textResult.stdout);
+}
+
+export function listPwgenCandidates(preferredExecutablePath?: string, envPath = process.env.PATH ?? ""): string[] {
+  const normalizedPreferredPath = preferredExecutablePath?.trim();
+  const pathCandidates = envPath
+    .split(delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => join(entry, "pwgen"));
+
+  return Array.from(new Set([normalizedPreferredPath, ...pathCandidates, ...COMMON_PWGEN_PATHS].filter(Boolean) as string[]));
+}
+
+async function resolvePwgenExecutable(preferredExecutablePath?: string): Promise<string> {
+  const candidates = listPwgenCandidates(preferredExecutablePath);
+
+  for (const candidate of candidates) {
+    if (await isExecutable(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new PwgenCliError(
+    "not_found",
+    "pwgen was not found",
+    "Raycast could not resolve the pwgen executable from its runtime environment.",
+    preferredExecutablePath
+      ? "Verify the configured executable path in extension preferences, or point it to your installed pwgen binary."
+      : "Open the extension preferences and set the pwgen executable path, for example /Users/you/.cargo/bin/pwgen.",
+  );
+}
+
+async function isExecutable(candidate: string): Promise<boolean> {
+  try {
+    await access(candidate, constants.X_OK);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function toPwgenCliError(error: unknown): PwgenCliError {

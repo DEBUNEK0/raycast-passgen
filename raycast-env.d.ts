@@ -7,7 +7,10 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {}
+type ExtensionPreferences = {
+  /** pwgen Executable Path - Optional absolute path to the pwgen executable. Set this when Raycast cannot find pwgen on PATH. */
+  "pwgenPath"?: string
+}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences

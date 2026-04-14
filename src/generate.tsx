@@ -6,6 +6,8 @@ import {
   Form,
   List,
   Toast,
+  getPreferenceValues,
+  openExtensionPreferences,
   showToast,
 } from "@raycast/api";
 import { useState } from "react";
@@ -77,6 +79,7 @@ export default function Command() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [screenState, setScreenState] = useState<ScreenState>({ kind: "form" });
   const [isGenerating, setIsGenerating] = useState(false);
+  const preferences = getPreferenceValues<{ pwgenPath?: string }>();
 
   const canCopyAll = screenState.kind === "single" || screenState.kind === "multiple";
 
@@ -133,6 +136,9 @@ export default function Command() {
         markdown={buildErrorMarkdown(screenState.error)}
         actions={
           <ActionPanel>
+            {screenState.error.code === "not_found" ? (
+              <Action title="Open Extension Preferences" onAction={openExtensionPreferences} />
+            ) : null}
             <Action title="Back to Options" onAction={() => setScreenState({ kind: "form" })} />
             <Action title="Try Again" onAction={() => void handleGenerate()} />
           </ActionPanel>
@@ -288,7 +294,9 @@ export default function Command() {
     });
 
     try {
-      const parsedResult = await generatePasswords(validation.options);
+      const parsedResult = await generatePasswords(validation.options, {
+        preferredExecutablePath: preferences.pwgenPath,
+      });
       const copiedToClipboard = formValues.copyAfterGenerate ? await copyPasswords(parsedResult.passwords, true) : false;
       const result: GeneratedPasswordResult = {
         ...parsedResult,

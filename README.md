@@ -30,7 +30,9 @@ PWGen is a production-oriented Raycast Extension that delegates all password gen
 
 2. Ensure `pwgen` is available on your shell `PATH`.
 
-3. Start Raycast development mode:
+3. If Raycast still cannot find it, open the extension preferences and set `pwgen Executable Path` explicitly.
+
+4. Start Raycast development mode:
 
    ```bash
    npm run dev
@@ -55,6 +57,14 @@ cargo install --path /path/to/pwgen
 ```
 
 If your team distributes the binary another way, make sure the installed executable is named `pwgen` and is discoverable on `PATH` from the Raycast process.
+
+Raycast often runs with a narrower `PATH` than your interactive shell. This extension therefore:
+
+- checks the configured `pwgen Executable Path` preference first
+- checks Raycast's current `PATH`
+- also probes common install locations such as `~/.cargo/bin/pwgen`, `/opt/homebrew/bin/pwgen`, and `/usr/local/bin/pwgen`
+
+If the binary is still not found, set the absolute path in preferences explicitly.
 
 ## Development Commands
 

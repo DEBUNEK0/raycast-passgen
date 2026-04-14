@@ -4,11 +4,11 @@
   "description": "Generate secure passwords in Raycast by delegating all password generation to the pwgen CLI.",
   "version": "0.1.0",
   "icon": "icon.png",
-  "author": "DENUNEK0",
+  "author": "thomas",
   "license": "MIT",
   "private": true,
   "categories": [
-    "Programming Languages"
+    "Extension Packs"
   ],
   "keywords": [
     "password",
@@ -18,6 +18,16 @@
   ],
   "platforms": [
     "macOS"
+  ],
+  "preferences": [
+    {
+      "name": "pwgenPath",
+      "title": "pwgen Executable Path",
+      "description": "Optional absolute path to the pwgen executable. Set this when Raycast cannot find pwgen on PATH.",
+      "type": "file",
+      "required": false,
+      "placeholder": "/Users/you/.cargo/bin/pwgen"
+    }
   ],
   "commands": [
     {
