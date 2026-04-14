@@ -1,0 +1,53 @@
+{
+  "name": "raycast-pwgen",
+  "title": "PWGen",
+  "description": "Generate secure passwords in Raycast by delegating all password generation to the pwgen CLI.",
+  "version": "0.1.0",
+  "icon": "icon.png",
+  "author": "DENUNEK0",
+  "license": "MIT",
+  "private": true,
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "password",
+    "security",
+    "pwgen",
+    "raycast"
+  ],
+  "platforms": [
+    "macOS"
+  ],
+  "commands": [
+    {
+      "name": "generate",
+      "title": "Generate Password",
+      "description": "Generate secure passwords with the pwgen CLI",
+      "icon": "icon.png",
+      "mode": "view",
+      "keywords": [
+        "password",
+        "security",
+        "pwgen",
+        "entropy"
+      ]
+    }
+  ],
+  "scripts": {
+    "dev": "npx ray develop",
+    "build": "npx ray build -e dist",
+    "lint": "npx ray lint",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@raycast/api": "1.104.12",
+    "react": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "typescript": "6.0.2",
+    "vitest": "4.1.4"
+  }
+}
