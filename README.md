@@ -5,8 +5,10 @@ PWGen is a production-oriented Raycast Extension that delegates all password gen
 ## Features
 
 - Generate passwords with the trusted `pwgen` backend.
+- Launch a direct `Generate Standard Password` command that immediately creates and copies the default standard password.
 - Configure length, count, character classes, ambiguous-character exclusion, and minimum per-class constraints.
 - Use productized presets:
+  - Standard
   - Strong
   - Simple
   - PIN

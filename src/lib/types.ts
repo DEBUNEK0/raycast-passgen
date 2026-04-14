@@ -1,4 +1,4 @@
-export type PresetId = "custom" | "strong" | "simple" | "pin";
+export type PresetId = "custom" | "standard" | "strong" | "simple" | "pin";
 
 export type CliErrorCode = "not_found" | "invalid_args" | "empty_output" | "parse_failed" | "unknown";
 

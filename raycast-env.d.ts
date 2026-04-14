@@ -18,10 +18,14 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `generate` command */
   export type Generate = ExtensionPreferences & {}
+  /** Preferences accessible in the `generate-standard` command */
+  export type GenerateStandard = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
   /** Arguments passed to the `generate` command */
   export type Generate = {}
+  /** Arguments passed to the `generate-standard` command */
+  export type GenerateStandard = {}
 }
 

@@ -6,7 +6,7 @@ export const DEFAULT_OPTIONS: GeneratePasswordOptions = {
   lowercase: true,
   uppercase: true,
   digits: true,
-  symbols: true,
+  symbols: false,
   excludeAmbiguous: false,
   minLowercase: 0,
   minUppercase: 0,
@@ -15,6 +15,18 @@ export const DEFAULT_OPTIONS: GeneratePasswordOptions = {
 };
 
 export const PRESET_VALUES: Record<Exclude<PresetId, "custom">, PresetOptions> = {
+  standard: {
+    length: 16,
+    lowercase: true,
+    uppercase: true,
+    digits: true,
+    symbols: false,
+    excludeAmbiguous: false,
+    minLowercase: 0,
+    minUppercase: 0,
+    minDigits: 0,
+    minSymbols: 0,
+  },
   strong: {
     length: 20,
     lowercase: true,

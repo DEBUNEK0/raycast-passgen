@@ -8,7 +8,7 @@
   "license": "MIT",
   "private": true,
   "categories": [
-    "Extension Packs"
+    "Developer Tools"
   ],
   "keywords": [
     "password",
@@ -41,6 +41,20 @@
         "security",
         "pwgen",
         "entropy"
+      ]
+    },
+    {
+      "name": "generate-standard",
+      "title": "Generate Standard Password",
+      "description": "Generate and copy a standard password immediately",
+      "icon": "icon.png",
+      "mode": "no-view",
+      "keywords": [
+        "password",
+        "security",
+        "pwgen",
+        "standard",
+        "quick"
       ]
     }
   ],

@@ -59,7 +59,7 @@ type ScreenState =
     };
 
 const DEFAULT_FORM_VALUES: FormValues = {
-  presetId: "custom",
+  presetId: "standard",
   length: String(DEFAULT_OPTIONS.length),
   count: String(DEFAULT_OPTIONS.count),
   lowercase: DEFAULT_OPTIONS.lowercase,
@@ -163,6 +163,7 @@ export default function Command() {
         value={formValues.presetId}
         onChange={(value) => handlePresetChange(value as PresetId)}
       >
+        <Form.Dropdown.Item value="standard" title="Standard" />
         <Form.Dropdown.Item value="custom" title="Custom" />
         <Form.Dropdown.Item value="strong" title="Strong" />
         <Form.Dropdown.Item value="simple" title="Simple" />
@@ -264,8 +265,8 @@ export default function Command() {
       const nextOptions = applyPreset(toGeneratePasswordOptions(current), presetId);
       return {
         ...fromGeneratePasswordOptions(nextOptions),
-        count: current.count,
-        copyAfterGenerate: current.copyAfterGenerate,
+        count: presetId === "standard" ? "1" : current.count,
+        copyAfterGenerate: presetId === "standard" ? true : current.copyAfterGenerate,
         presetId,
       };
     });
